@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>PIKUL</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <main id="loginScreen" class="screen screen--center">
+    <div class="card auth-card">
+      <div class="brand">
+        <div class="brand__logo">P</div>
+        <div class="brand__text">
+          <h1>PIKUL</h1>
+          <p>Pedagang kaki lima, lebih dekat.</p>
+        </div>
+      </div>
+
+      <form id="loginForm" class="form">
+        <label class="label">
+          Email
+          <input id="email" class="input" type="email" placeholder="contoh@pikul.id" required />
+        </label>
+
+        <label class="label">
+          Password
+          <input id="password" class="input" type="password" placeholder="••••••••" minlength="4" required />
+        </label>
+
+        <button class="btn btn--primary" type="submit">Masuk</button>
+        <button id="demoBtn" class="btn btn--ghost" type="button">Masuk pakai akun demo</button>
+
+        <small class="hint">
+          Tips: pakai demo dulu biar alurnya jelas, baru kembangkan fitur registrasi.
+        </small>
+      </form>
+    </div>
+  </main>
+
+  <!-- APP SHELL -->
+  <div id="appShell" class="app hidden">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <div class="pill">🛵 PIKUL</div>
+      </div>
+      <div class="topbar__right">
+        <button id="locBtn" class="icon-btn" title="Ambil lokasi">📍</button>
+        <button id="logoutBtn" class="icon-btn" title="Keluar">⎋</button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- HOME -->
+      <section id="screenHome" class="screen">
+        <div class="hero">
+          <h2>Halo, <span id="userName">Pengguna</span> 👋</h2>
+          <p class="muted">Cari pedagang terdekat, lihat menu, lalu pesan.</p>
+
+          <div class="searchRow">
+            <input id="searchInput" class="input" placeholder="Cari: bakso, kopi, nasi goreng..." />
+            <button id="refreshVendorsBtn" class="btn btn--small">Refresh</button>
+          </div>
+        </div>
+
+        <div class="sectionTitle">
+          <h3>Pedagang terdekat</h3>
+          <span id="gpsBadge" class="badge badge--warn">GPS: belum aktif</span>
+        </div>
+
+        <div id="vendorList" class="grid"></div>
+
+        <div class="sectionTitle">
+          <h3>Keranjang</h3>
+          <span id="cartCount" class="badge">0 item</span>
+        </div>
+
+        <div id="cartBox" class="card cart"></div>
+      </section>
+
+      <!-- MAP -->
+      <section id="screenMap" class="screen hidden">
+        <div class="mapCard card">
+          <div class="mapHeader">
+            <h3>Peta Realtime</h3>
+            <p class="muted">Lokasi kamu + pedagang (simulasi bergerak).</p>
+          </div>
+
+          <div class="mapBox">
+            <div class="mapPin you">Kamu</div>
+            <div id="vendorPins"></div>
+          </div>
+
+          <div class="mapFooter">
+            <div class="row">
+              <div>
+                <div class="muted">Lokasi kamu</div>
+                <div id="youCoord" class="mono">-</div>
+              </div>
+              <button id="openMapsBtn" class="btn btn--primary btn--small">Buka Maps</button>
+            </div>
+            <small class="hint">Catatan: ini peta sederhana (tanpa API eksternal). Kamu bisa upgrade ke Google Maps/Leaflet nanti.</small>
+          </div>
+        </div>
+
+        <div class="sectionTitle">
+          <h3>Daftar pedagang (realtime)</h3>
+          <span id="tick" class="badge">update: -</span>
+        </div>
+
+        <div id="vendorRealtimeList" class="list"></div>
+      </section>
+
+      <!-- ORDERS (relevan sebagai menu ke-5) -->
+      <section id="screenOrders" class="screen hidden">
+        <div class="hero">
+          <h2>Pesanan</h2>
+          <p class="muted">Riwayat pesanan kamu akan muncul di sini.</p>
+        </div>
+        <div id="ordersList" class="list"></div>
+        <div class="card note">
+          <b>Mentor note:</b> “Orders” itu penting untuk aplikasi seperti Grab, karena pengguna selalu butuh tracking & history.
+        </div>
+      </section>
+
+      <!-- MESSAGES -->
+      <section id="screenMessages" class="screen hidden">
+        <div class="hero">
+          <h2>Messages</h2>
+          <p class="muted">Chat sederhana antara konsumen ↔ pedagang.</p>
+        </div>
+
+        <div class="card">
+          <div class="row row--between">
+            <div>
+              <div class="muted">Chat dengan</div>
+              <div id="chatWith"><b>-</b></div>
+            </div>
+            <button id="pickVendorChatBtn" class="btn btn--small">Pilih pedagang</button>
+          </div>
+          <div id="chatBox" class="chatBox"></div>
+
+          <div class="chatInputRow">
+            <input id="chatInput" class="input" placeholder="Tulis pesan..." />
+            <button id="sendChatBtn" class="btn btn--primary">Kirim</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="screenProfile" class="screen hidden">
+        <div class="hero">
+          <h2>Profil</h2>
+          <p class="muted">Pengaturan akun sederhana.</p>
+        </div>
+
+        <div class="card">
+          <div class="profileRow">
+            <div class="avatar">👤</div>
+            <div>
+              <div id="profileName" class="big"><b>Pengguna</b></div>
+              <div id="profileEmail" class="muted">-</div>
+            </div>
+          </div>
+
+          <hr class="sep"/>
+
+          <div class="row row--between">
+            <div>
+              <div class="muted">Saldo (dummy)</div>
+              <div class="big"><b id="wallet">Rp 0</b></div>
+            </div>
+            <button id="topupBtn" class="btn btn--small">Top Up</button>
+          </div>
+
+          <div class="row row--between">
+            <div class="muted">Notifikasi</div>
+            <label class="switch">
+              <input id="notifToggle" type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <small class="hint">Ini versi sederhana. Next step: simpan preferensi user ke backend / database.</small>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottomNav">
+      <button class="navItem active" data-target="Home">
+        <span class="navIcon">🏠</span><span class="navText">Home</span>
+      </button>
+      <button class="navItem" data-target="Map">
+        <span class="navIcon">🗺️</span><span class="navText">Map</span>
+      </button>
+      <button class="navItem" data-target="Orders">
+        <span class="navIcon">🧾</span><span class="navText">Orders</span>
+      </button>
+      <button class="navItem" data-target="Messages">
+        <span class="navIcon">💬</span><span class="navText">Messages</span>
+      </button>
+      <button class="navItem" data-target="Profile">
+        <span class="navIcon">👤</span><span class="navText">Profile</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- MODAL: VENDOR DETAIL -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal__overlay" id="modalOverlay"></div>
+    <div class="modal__panel">
+      <div class="modal__header">
+        <div>
+          <div class="muted">Pedagang</div>
+          <h3 id="modalTitle">-</h3>
+        </div>
+        <button id="closeModalBtn" class="icon-btn" title="Tutup">✕</button>
+      </div>
+
+      <div class="modal__body">
+        <div class="row row--between">
+          <div>
+            <div class="muted">Jarak</div>
+            <div id="modalDistance" class="big"><b>-</b></div>
+          </div>
+          <button id="chatVendorBtn" class="btn btn--small">Chat pedagang</button>
+        </div>
+
+        <div class="sectionTitle">
+          <h3>Menu</h3>
+          <span class="badge">tap untuk tambah</span>
+        </div>
+        <div id="menuList" class="list"></div>
+      </div>
+
+      <div class="modal__footer">
+        <button id="goCheckoutBtn" class="btn btn--primary">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHECKOUT -->
+  <div id="checkoutModal" class="modal hidden">
+    <div class="modal__overlay" id="checkoutOverlay"></div>
+    <div class="modal__panel">
+      <div class="modal__header">
+        <div>
+          <div class="muted">Checkout</div>
+          <h3>Konfirmasi Pesanan</h3>
+        </div>
+        <button id="closeCheckoutBtn" class="icon-btn">✕</button>
+      </div>
+
+      <div class="modal__body">
+        <div id="checkoutItems" class="list"></div>
+
+        <div class="card payBox">
+          <div class="row row--between">
+            <div class="muted">Metode bayar</div>
+            <select id="payMethod" class="input select">
+              <option value="cash">Cash</option>
+              <option value="ewallet">E-Wallet (dummy)</option>
+              <option value="transfer">Transfer (dummy)</option>
+            </select>
+          </div>
+
+          <div class="row row--between">
+            <div class="muted">Total</div>
+            <div class="big"><b id="checkoutTotal">Rp 0</b></div>
+          </div>
+
+          <label class="label">
+            Catatan untuk pedagang (opsional)
+            <input id="orderNote" class="input" placeholder="contoh: jangan pakai sambal" />
+          </label>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button id="placeOrderBtn" class="btn btn--primary">Buat Pesanan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PICK VENDOR FOR CHAT -->
+  <div id="pickChatModal" class="modal hidden">
+    <div class="modal__overlay" id="pickChatOverlay"></div>
+    <div class="modal__panel">
+      <div class="modal__header">
+        <div>
+          <div class="muted">Pilih pedagang</div>
+          <h3>Chat dengan siapa?</h3>
+        </div>
+        <button id="closePickChatBtn" class="icon-btn">✕</button>
+      </div>
+      <div class="modal__body">
+        <div id="pickChatList" class="list"></div>
+      </div>
+      <div class="modal__footer">
+        <button id="closePickChatBtn2" class="btn btn--ghost">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
